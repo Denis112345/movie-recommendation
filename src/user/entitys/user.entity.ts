@@ -1,3 +1,4 @@
+import { CreationAttributes } from 'sequelize';
 import {
   Table,
   Column,
@@ -13,45 +14,26 @@ export class User extends Model<User> {
   declare id: number;
 
   @Column({ type: DataType.STRING })
-  username: string;
+  username!: string;
 
   @Column({
     type: DataType.STRING,
     unique: true,
-    validate: {
-      isEmail: true,
-      notEmpty: true,
-    },
+    allowNull: false,
   })
-  email: string;
+  email!: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    validate: {
-      len: [12, 255],
-      notEmpty: true,
-    },
   })
-  password: string;
+  password!: string;
 
-  @Column({
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
-  })
+  @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
   declare updatedAt: Date;
 
-  @Column({
-    type: DataType.DATE,
-    defaultValue: DataType.NOW,
-    allowNull: false,
-    validate: {
-      notEmpty: true,
-    },
-  })
+  @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
   declare createdAt: Date;
 }
+
+export type UserCreationAttributes = CreationAttributes<User>;

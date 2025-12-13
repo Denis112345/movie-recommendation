@@ -1,12 +1,14 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { User } from "./entitys/user.entity";
-import { UserCreateDTO } from "./dto/user.createDto";
+import { Injectable } from "@nestjs/common";
+import { User, UserCreationAttributes } from "./entitys/user.entity";
+import { AuthCreateDTO } from "../auth/dto/auth.createDto";
+import { InjectModel } from "@nestjs/sequelize";
+import { CreateOptions } from "sequelize";
 
 
 @Injectable()
 export class UserService {
     constructor(
-        @Inject('USERS_REPOSITORY')
+        @InjectModel(User)
         private userRepo: typeof User
     ){}
 
@@ -14,7 +16,8 @@ export class UserService {
         return this.userRepo.findAll()
     }
     
-    create(dto: UserCreateDTO): Promise<User> {
-        return this.userRepo.create()
+    create(dto: AuthCreateDTO, options?: CreateOptions): Promise<User> {
+        return this.userRepo.create(dto as UserCreationAttributes, options); 
     }
+
 }
