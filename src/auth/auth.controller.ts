@@ -1,20 +1,35 @@
-import { Body, Controller, Post, UsePipes } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "nestjs-zod";
 import { AuthCreateSchema } from "./dto/auth.createDto";
 import type { AuthCreateDTO } from "./dto/auth.createDto";
 import { User } from "src/user/entitys/user.entity";
 import { UserService } from "src/user/user.service";
+import { AuthSignInSchema } from "./dto/auth.signInDto";
+import type { AuthSignInDTO } from "./dto/auth.signInDto";
+import { AuthService } from "./auth.service";
+import { Public } from "src/decorators/app.public";
 
 
 @Controller('auth')
 export class AuthController {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly authService: AuthService
     ){}
 
+    @Public()
     @Post('register')
     @UsePipes(new ZodValidationPipe(AuthCreateSchema))
-    createUser(@Body() dto: AuthCreateDTO): Promise<User> {
-        return this.userService.create(dto)
-    } 
+    async createUser(@Body() dto: AuthCreateDTO): Promise<{id: number, username: string}> {
+        const user: User = await this.userService.create(dto)
+        return { id: user.id, username: user.username }
+    }
+
+    @Public()
+    @HttpCode(HttpStatus.OK)
+    @Post('login')
+    @UsePipes(new ZodValidationPipe(AuthSignInSchema))
+    async signIn(@Body() dto: AuthSignInDTO): Promise<{jwt_token: string}> {
+        return await this.authService.signIn(dto)
+    }
 }

@@ -21,13 +21,13 @@ export class User extends Model<User> {
     unique: true,
     allowNull: false,
   })
-  email!: string;
+  declare email: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  password!: string;
+  declare password: string;
 
   @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
   declare updatedAt: Date;

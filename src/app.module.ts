@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserApp } from './user/user.module';
 import { AuthApp } from './auth/auth.module';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtSalt } from './constanst';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { Public } from './decorators/app.public';
 
 @Module({
   imports: [
@@ -17,10 +21,20 @@ import { SequelizeModule } from '@nestjs/sequelize';
       autoLoadModels: true,
       synchronize: true,
     }),
+    JwtModule.register({
+      global: true,
+      secret: jwtSalt,
+      signOptions: { expiresIn: '1h' },
+    }),
     UserApp,
     AuthApp,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
+    }
+  ]
 })
 export class AppModule {}
