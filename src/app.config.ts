@@ -8,6 +8,7 @@ export default () => {
             username: process.env.DB_USER || 'movie',
             password: process.env.DB_PASSWORD || 'password',
             provider: process.env.DB_PROVIDER || 'postgres'
-        }
+        },
+        external_movie_api_token: process.env.EXTERNAL_MOVIE_API_TOKEN || ''
     }
 }

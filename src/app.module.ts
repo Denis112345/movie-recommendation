@@ -12,6 +12,10 @@ import config from './app.config'
 import { DatabaseConfig } from './app.interface'
 import { User } from './user/entitys/user.entity';
 import { Role } from './user/entitys/role.entity';
+import { MovieApp } from './movie/movie.module';
+import { Movie } from './movie/entitys/movie.entity';
+import { Genre } from './movie/entitys/genre.entity';
+import { MovieGenre } from './movie/entitys/movieGener.entity';
 
 @Module({
   imports: [
@@ -31,7 +35,7 @@ import { Role } from './user/entitys/role.entity';
           username: dbConfig.username,
           password: dbConfig.password,
           database: dbConfig.db_name,
-          models: [User, Role],
+          models: [User, Role, Movie, Genre, MovieGenre],
           autoLoadModels: true,
           synchronize: true
         }
@@ -45,6 +49,7 @@ import { Role } from './user/entitys/role.entity';
     }),
     UserApp,
     AuthApp,
+    MovieApp
   ],
   providers: [
     AppService,

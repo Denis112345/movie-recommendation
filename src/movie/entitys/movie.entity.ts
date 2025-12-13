@@ -1,0 +1,54 @@
+import { BelongsToMany, Model } from "sequelize-typescript";
+import { Column, DataType, ForeignKey, PrimaryKey, Table } from "sequelize-typescript";
+import { Genre } from "./genre.entity";
+import { MovieGenre } from "./movieGener.entity";
+
+
+@Table
+export class Movie extends Model<Movie> {
+    @PrimaryKey
+    @Column({ type: DataType.INTEGER })
+    declare id: number
+
+    @Column({
+        type: DataType.STRING,
+        validate: {
+            len: [2, 300]
+        }
+    })
+    title: string
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+        validate: {
+            len: [10, 300]
+        }
+    })
+    description?: string
+
+    @Column({
+        type: DataType.INTEGER,
+        validate: {
+            isValideYear(year: number) {
+                if (year < 1000 && year > 2100) {
+                    throw new Error('Не может быть такого года')
+                }
+            }
+        }
+    })
+    releaseYear: number
+
+    @ForeignKey(() => Genre)
+    @Column({ type: DataType.INTEGER })
+    genre_id: number
+
+    @BelongsToMany(() => Genre, () => MovieGenre)
+    genres: Genre[]
+
+    @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
+    declare updatedAt: Date;
+
+    @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
+    declare createdAt: Date;
+}

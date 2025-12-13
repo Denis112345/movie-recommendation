@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { User, UserCreationAttributes } from "./entitys/user.entity";
 import { AuthCreateDTO } from "../auth/dto/auth.createDto";
 import { InjectModel } from "@nestjs/sequelize";
-import { CreateOptions, where } from "sequelize";
+import { CreateOptions } from "sequelize";
 
 
 @Injectable()

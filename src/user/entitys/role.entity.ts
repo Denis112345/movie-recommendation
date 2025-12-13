@@ -1,4 +1,5 @@
-import { Model, Column, DataType, PrimaryKey, Table } from "sequelize-typescript";
+import { Model, Column, DataType, PrimaryKey, Table, HasMany } from "sequelize-typescript";
+import { User } from "./user.entity";
 
 
 @Table
@@ -14,5 +15,7 @@ export class Role extends Model<Role> {
         }
     })
     title: string
-    
+
+    @HasMany(() => User)
+    users: User[]
 }
