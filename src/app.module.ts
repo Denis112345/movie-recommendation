@@ -7,20 +7,34 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtSalt } from './constanst';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
-import { Public } from './decorators/app.public';
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import config from './config/configuration'
+import DBConfigInterface from './interfaces/app.ConfigDBInterface'
 
 @Module({
   imports: [
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      host: 'localhost',
-      port: 30001,
-      username: 'movie',
-      password: 'movie',
-      database: 'movie',
-      autoLoadModels: true,
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config]
     }),
+    SequelizeModule.forRootAsync( {
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = configService.getOrThrow<DBConfigInterface>('database')
+        return {
+          dialect: dbConfig.provider,
+          host: dbConfig.host,
+          port: dbConfig.port,
+          username: dbConfig.username,
+          password: dbConfig.password,
+          database: dbConfig.db_name,
+          autoLoadModels: true,
+          synchronize: true
+        }
+      }
+    }
+  ),
     JwtModule.register({
       global: true,
       secret: jwtSalt,
