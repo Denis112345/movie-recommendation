@@ -5,7 +5,10 @@ import {
   Model,
   PrimaryKey,
   DataType,
+  ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
+import { Role } from './role.entity';
 
 @Table
 export class User extends Model<User> {
@@ -34,6 +37,13 @@ export class User extends Model<User> {
 
   @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
   declare createdAt: Date;
+
+  @ForeignKey(() => Role)
+  @Column({ type: DataType.INTEGER })
+  role_id: number
+
+  @BelongsTo(() => Role)
+  role: Role
 }
 
 export type UserCreationAttributes = CreationAttributes<User>;

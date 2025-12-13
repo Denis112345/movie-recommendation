@@ -10,6 +10,8 @@ import { AuthGuard } from './auth/guards/auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import config from './app.config'
 import { DatabaseConfig } from './app.interface'
+import { User } from './user/entitys/user.entity';
+import { Role } from './user/entitys/role.entity';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { DatabaseConfig } from './app.interface'
           username: dbConfig.username,
           password: dbConfig.password,
           database: dbConfig.db_name,
+          models: [User, Role],
           autoLoadModels: true,
           synchronize: true
         }
