@@ -1,7 +1,7 @@
 import { Dialect } from "sequelize"
 
 
-export default interface DatabaseConfig {
+export interface DatabaseConfig {
     port: number,
     host: string,
     db_name: string,

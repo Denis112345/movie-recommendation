@@ -7,7 +7,7 @@ import { UserService } from "src/user/user.service";
 import { AuthSignInSchema } from "./dto/auth.signInDto";
 import type { AuthSignInDTO } from "./dto/auth.signInDto";
 import { AuthService } from "./auth.service";
-import { Public } from "src/decorators/app.public";
+import { Public } from "src/app.decorator";
 
 
 @Controller('auth')

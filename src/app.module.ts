@@ -8,8 +8,8 @@ import { jwtSalt } from './constanst';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import config from './config/configuration'
-import DBConfigInterface from './interfaces/app.ConfigDBInterface'
+import config from './app.config'
+import { DatabaseConfig } from './app.interface'
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import DBConfigInterface from './interfaces/app.ConfigDBInterface'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const dbConfig = configService.getOrThrow<DBConfigInterface>('database')
+        const dbConfig = configService.getOrThrow<DatabaseConfig>('database')
         return {
           dialect: dbConfig.provider,
           host: dbConfig.host,
