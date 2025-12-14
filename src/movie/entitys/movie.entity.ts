@@ -2,12 +2,13 @@ import { BelongsToMany, Model } from "sequelize-typescript";
 import { Column, DataType, ForeignKey, PrimaryKey, Table } from "sequelize-typescript";
 import { Genre } from "./genre.entity";
 import { MovieGenre } from "./movieGener.entity";
+import { CreationAttributes } from "sequelize";
 
 
 @Table
 export class Movie extends Model<Movie> {
     @PrimaryKey
-    @Column({ type: DataType.INTEGER })
+    @Column({ type: DataType.INTEGER, autoIncrement: true})
     declare id: number
 
     @Column({
@@ -19,11 +20,8 @@ export class Movie extends Model<Movie> {
     title: string
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.TEXT,
         allowNull: true,
-        validate: {
-            len: [10, 300]
-        }
     })
     description?: string
 
@@ -39,10 +37,6 @@ export class Movie extends Model<Movie> {
     })
     releaseYear: number
 
-    @ForeignKey(() => Genre)
-    @Column({ type: DataType.INTEGER })
-    genre_id: number
-
     @BelongsToMany(() => Genre, () => MovieGenre)
     genres: Genre[]
 
@@ -52,3 +46,5 @@ export class Movie extends Model<Movie> {
     @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
     declare createdAt: Date;
 }
+
+export type MovieCreationAttribute = CreationAttributes<Movie> 

@@ -10,6 +10,6 @@ async function startApp() {
   const sequelize = app.get<Sequelize>(getConnectionToken());
   await sequelize.sync({ alter: true });
   
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3002);
 }
 startApp();

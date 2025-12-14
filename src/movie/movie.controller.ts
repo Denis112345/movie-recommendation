@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "nestjs-zod";
-import { MovieCreateSchema } from "./dto/movie.createDto";
-import type { MovieCreateDTO } from "./dto/movie.createDto";
+import { MovieRequestCreateSchema } from "./dto/movie.createDto";
+import type { MovieRequestCreateDTO } from "./dto/movie.createDto";
 import { MovieService } from "./movie.service";
 
 
@@ -26,8 +26,8 @@ export class MovieController {
     }
 
     @Post()
-    @UsePipes(new ZodValidationPipe(MovieCreateSchema))
-    addMovie(@Body() dto: MovieCreateDTO) {
+    @UsePipes(new ZodValidationPipe(MovieRequestCreateSchema))
+    addMovie(@Body() dto: MovieRequestCreateDTO) {
         return this.movieService.create(dto)
     }
 } 

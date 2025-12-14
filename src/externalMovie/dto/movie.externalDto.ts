@@ -13,5 +13,5 @@ const MovieExternalPaginateSchema = z.object({
 })
 
 
-export type MovieEternalDTO = z.infer<typeof MovieExternalSchema>
+export type MovieExternalDTO = z.infer<typeof MovieExternalSchema>
 export type MovieExternalPaginateDTO = z.infer<typeof MovieExternalPaginateSchema>

@@ -2,6 +2,7 @@ import { BelongsToMany, Model } from "sequelize-typescript";
 import { Column, DataType, PrimaryKey, Table } from "sequelize-typescript";
 import { Movie } from "./movie.entity";
 import { MovieGenre } from "./movieGener.entity";
+import { CreationAttributes } from "sequelize";
 
 
 @Table
@@ -21,3 +22,5 @@ export class Genre extends Model<Genre> {
     @BelongsToMany(() => Movie, () => MovieGenre)
     movies: Movie[]
 }
+
+export type GenreCreationAttributes = CreationAttributes<Genre>
