@@ -9,12 +9,16 @@ export const MovieExternalSchema = z.object({
         z.object({
             genre: z.string()
         })
-    )
+    ),
+    ratingImdb: z.float32(),
+    kinopoiskId: z.number()
 }).transform((data) => ({
     title: data.nameRu,
     description: data.description,
     year: data.year,
-    genres: data.genres.map((genre_obj) => ({title: genre_obj.genre}))
+    genres: data.genres.map((genre_obj) => ({title: genre_obj.genre})),
+    ratingImdb: data.ratingImdb,
+    kinopoiskId: data.kinopoiskId
 }))
 
 

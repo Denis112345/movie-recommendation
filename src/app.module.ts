@@ -16,6 +16,8 @@ import { MovieApp } from './movie/movie.module';
 import { Movie } from './movie/entitys/movie.entity';
 import { Genre } from './movie/entitys/genre.entity';
 import { MovieGenre } from './movie/entitys/movieGener.entity';
+import { ExternalMovieApp } from './externalMovie/externalMovie.module';
+import { CacheModule } from '@nestjs/cache-manager'
 
 @Module({
   imports: [
@@ -40,16 +42,22 @@ import { MovieGenre } from './movie/entitys/movieGener.entity';
           synchronize: true
         }
       }
-    }
-  ),
+    }),
     JwtModule.register({
-      global: true,
-      secret: jwtSalt,
-      signOptions: { expiresIn: '1h' },
+        global: true,
+        secret: jwtSalt,
+        signOptions: { expiresIn: '1h' },
+    }),
+    CacheModule.register({
+      store: 'memory',
+      max: 1000,
+      ttl: 3600000, // 1 час в миллисекундах
+      isGlobal: true
     }),
     UserApp,
     AuthApp,
-    MovieApp
+    MovieApp,
+    ExternalMovieApp
   ],
   providers: [
     AppService,

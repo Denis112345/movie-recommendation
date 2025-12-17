@@ -6,6 +6,7 @@ import { ExternalMovieService } from "src/externalMovie/externalMovie.service";
 import { MovieDTO } from "./dto/movie.dto";
 import { GenreDTO, GenreSchema } from "./dto/genre.dto";
 import { Genre, GenreCreationAttributes } from "./entitys/genre.entity";
+import { MovieExternalDTO } from "src/externalMovie/dto/movie.externalDto"
 
 @Injectable()
 export class MovieService {
@@ -24,22 +25,28 @@ export class MovieService {
     }
 
     async create(dto: MovieRequestCreateDTO): Promise<Movie> {
-        const external_movie: MovieDTO = await this.externalMovie.getMovieInfo(dto)
-        
+        const external_movie: MovieExternalDTO = await this.externalMovie.getMovieByTitle(dto)
+        const movie: MovieDTO = {
+            title: external_movie.title,
+            description: external_movie.description,
+            releaseYear: external_movie.year,
+            genres: external_movie.genres,
+            ratingImdb: external_movie.ratingImdb
+        }
         const new_genres: Genre[] = await Promise.all(
-            external_movie.genres.map(async (genre) => {
+            movie.genres.map(async (genre) => {
                 return await this.createGenre(GenreSchema.parse(genre))
             })
         )
 
-        if (await this.movieExists(external_movie.title)) {
+        if (await this.movieExists(movie.title)) {
             throw new BadRequestException('Такой фильм уже есть')
         }
 
         const new_movie = await this.movieRepo.create({
-            title: external_movie.title,
-            description: external_movie.description,
-            releaseYear: external_movie.releaseYear
+            title: movie.title,
+            description: movie.description,
+            releaseYear: movie.releaseYear
         } as MovieCreationAttribute)
 
         new_movie.$set('genres', new_genres)
@@ -56,6 +63,23 @@ export class MovieService {
     }
 
     async getAllMovies(): Promise<Movie[]> {
-        return await this.movieRepo.findAll()
+        return await this.movieRepo.findAll({
+            include: {
+                model: Genre,
+                through: { attributes: [] }
+            }
+        })
+    }
+
+    async getMovie(id: number): Promise<Movie> {
+        const movie: Movie | null = await this.movieRepo.findOne({
+            where: {id: id},
+            include: {
+                model: Genre,
+                through: { attributes: [] }
+            }
+        })
+        if (!movie) throw new BadRequestException('Фильма с таким id нет')
+        return movie
     }
 }

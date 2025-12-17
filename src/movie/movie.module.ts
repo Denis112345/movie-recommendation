@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { ExternalMoovieApp } from "src/externalMovie/externalMovie.module";
+import { ExternalMovieApp } from "src/externalMovie/externalMovie.module";
 import { MovieService } from "./movie.service";
 import { MovieController } from "./movie.controller";
 import { SequelizeModule } from "@nestjs/sequelize";
@@ -9,7 +9,7 @@ import { Genre } from "./entitys/genre.entity";
 
 @Module({
     imports: [
-        ExternalMoovieApp,
+        ExternalMovieApp,
         SequelizeModule.forFeature([Movie, Genre]),
     ],
     providers: [MovieService],

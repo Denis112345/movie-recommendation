@@ -45,6 +45,9 @@ export class Movie extends Model<Movie> {
 
     @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
     declare createdAt: Date;
+
+    @Column({type: DataType.FLOAT, defaultValue: 0.0})
+    raiting: number 
 }
 
 export type MovieCreationAttribute = CreationAttributes<Movie> 

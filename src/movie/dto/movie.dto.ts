@@ -7,7 +7,8 @@ export const MovieSchema = z.object(({
     releaseYear: z.number(),
     genres: z.array(
         GenreSchema
-    )
+    ),
+    ratingImdb: z.float32()
 }))
 
 export type MovieDTO = z.infer<typeof MovieSchema>

@@ -16,14 +16,9 @@ export class MovieController {
         return await this.movieService.getAllMovies()
     }
 
-    @Get('popular')
-    getPopularMovies() {
-        return []
-    }
-
     @Get(':id')
     getMovie(@Param('id') id: number) {
-        return []
+        return this.movieService.getMovie(id)
     }
 
     @Post()
