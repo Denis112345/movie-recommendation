@@ -2,15 +2,19 @@ import z from "zod";
 
 
 export const MovieExternalSchema = z.object({
-    Title: z.string(),
-    Plot: z.string(),
-    Year: z.string(),
-    Genre: z.string()
+    nameRu: z.string(),
+    description: z.string(),
+    year: z.number(),
+    genres: z.array(
+        z.object({
+            genre: z.string()
+        })
+    )
 }).transform((data) => ({
-    Title: data.Title,
-    Plot: data.Plot,
-    Year: data.Year,
-    Genre: data.Genre.split(',').map(g => g.trim())
+    title: data.nameRu,
+    description: data.description,
+    year: data.year,
+    genres: data.genres.map((genre_obj) => ({title: genre_obj.genre}))
 }))
 
 

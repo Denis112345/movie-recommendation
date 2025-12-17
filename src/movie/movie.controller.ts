@@ -10,9 +10,10 @@ export class MovieController {
     constructor(
         private readonly movieService: MovieService
     ){}
+    
     @Get()
-    getAllMovies() {
-        return []
+    async getAllMovies() {
+        return await this.movieService.getAllMovies()
     }
 
     @Get('popular')

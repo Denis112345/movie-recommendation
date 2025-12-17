@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie, MovieCreationAttribute } from "./entitys/movie.entity";
 import { MovieRequestCreateDTO } from "./dto/movie.createDto";
@@ -6,7 +6,6 @@ import { ExternalMovieService } from "src/externalMovie/externalMovie.service";
 import { MovieDTO } from "./dto/movie.dto";
 import { GenreDTO, GenreSchema } from "./dto/genre.dto";
 import { Genre, GenreCreationAttributes } from "./entitys/genre.entity";
-
 
 @Injectable()
 export class MovieService {
@@ -18,6 +17,12 @@ export class MovieService {
         private externalMovie: ExternalMovieService
     ){}
 
+    async movieExists(title: string): Promise<Boolean> {
+        const movie: Movie | null = await this.movieRepo.findOne({ where: { title: title } })
+        if (movie) return true
+        return false
+    }
+
     async create(dto: MovieRequestCreateDTO): Promise<Movie> {
         const external_movie: MovieDTO = await this.externalMovie.getMovieInfo(dto)
         
@@ -26,6 +31,11 @@ export class MovieService {
                 return await this.createGenre(GenreSchema.parse(genre))
             })
         )
+
+        if (await this.movieExists(external_movie.title)) {
+            throw new BadRequestException('Такой фильм уже есть')
+        }
+
         const new_movie = await this.movieRepo.create({
             title: external_movie.title,
             description: external_movie.description,
@@ -43,5 +53,9 @@ export class MovieService {
             genre = await this.genreRepo.create(dto as GenreCreationAttributes)
         }
         return genre
+    }
+
+    async getAllMovies(): Promise<Movie[]> {
+        return await this.movieRepo.findAll()
     }
 }

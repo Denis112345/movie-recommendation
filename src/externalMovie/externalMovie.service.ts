@@ -4,6 +4,7 @@ import { AxiosResponse } from "axios";
 import { MovieDTO } from "../movie/dto/movie.dto"
 import { MovieRequestCreateDTO } from "src/movie/dto/movie.createDto";
 import { MovieExternalDTO, MovieExternalSchema } from "./dto/movie.externalDto";
+import { ExternalMovieListDTO, ExternalMovieListSchema } from "./dto/movie.externalListDto";
 import axios from "axios"
 import type { AxiosInstance } from "axios";
 
@@ -15,30 +16,36 @@ export class ExternalMovieService {
         private readonly config: ConfigService
     ){
         this.client = axios.create({
-            baseURL: 'http://www.omdbapi.com/',
-            params: {
-                apikey: this.config.get('external_movie_api_token')
+            baseURL: 'https://kinopoiskapiunofficial.tech/api/v2.2',
+            headers: {
+                'X-API-KEY': this.config.get('external_movie_api_token'),
+                accept: 'application/json'
             }
         });
     }
 
-    async getMovieInfo(dto: MovieRequestCreateDTO): Promise<MovieDTO> {
-        let response: AxiosResponse<MovieExternalDTO> = await this.client.get('', {
+    async getMoviesByTitle(title: string): Promise<ExternalMovieListDTO> {
+        const response: AxiosResponse<ExternalMovieListDTO> = await this.client.get('films', {
             params: {
-                t: dto.title,
+                keyword: title,
             }
         })
+
+        return ExternalMovieListSchema.parse(response.data)
+    }
+
+    async getMovieInfo(dto: MovieRequestCreateDTO): Promise<MovieDTO> {
+        const external_movie_id: number = (await this.getMoviesByTitle(dto.title)).items[0].kinopoiskId
         
+        let response: AxiosResponse<MovieExternalDTO> = await this.client.get(`films/${external_movie_id}`)
+
         const external_movie: MovieExternalDTO = MovieExternalSchema.parse(response.data)
-        console.log(typeof external_movie.Genre)
+
         const movie: MovieDTO = {
-            title: external_movie.Title,
-            description: external_movie.Plot,
-            releaseYear: parseInt(external_movie.Year),
-            genres: external_movie.Genre.map((genre_title) => ({
-                    title: genre_title   
-                })
-            )
+            title: external_movie.title,
+            description: external_movie.description,
+            releaseYear: external_movie.year,
+            genres: external_movie.genres
         }
 
         return movie
