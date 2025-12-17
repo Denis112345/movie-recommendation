@@ -2,16 +2,16 @@ import z from "zod";
 
 
 export const MovieExternalSchema = z.object({
-    original_title: z.string(),
-    overview: z.string(),
-    release_date: z.string(),
-    genre_ids: z.array(z.number())
-})
-
-const MovieExternalPaginateSchema = z.object({
-    results: z.array(MovieExternalSchema),
-})
+    Title: z.string(),
+    Plot: z.string(),
+    Year: z.string(),
+    Genre: z.string()
+}).transform((data) => ({
+    Title: data.Title,
+    Plot: data.Plot,
+    Year: data.Year,
+    Genre: data.Genre.split(',').map(g => g.trim())
+}))
 
 
 export type MovieExternalDTO = z.infer<typeof MovieExternalSchema>
-export type MovieExternalPaginateDTO = z.infer<typeof MovieExternalPaginateSchema>
