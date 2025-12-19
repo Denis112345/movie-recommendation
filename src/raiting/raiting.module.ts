@@ -1,9 +1,13 @@
 import { Module } from "@nestjs/common";
+import { SequelizeModule } from "@nestjs/sequelize";
+import { Raiting } from "./entitys/raiting.entity";
+import { RaitingController } from "./raiting.controller";
+import { RaitingService } from "./raiting.service";
 
 @Module({
-    providers: [],
-    controllers: [],
+    providers: [RaitingService],
+    controllers: [RaitingController],
     exports: [],
-    imports: [],
+    imports: [SequelizeModule.forFeature([Raiting])],
 })
 export class RaitingApp {}

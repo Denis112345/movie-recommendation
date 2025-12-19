@@ -1,3 +1,4 @@
+import { CreationAttributes } from "sequelize";
 import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
 import { Movie } from "src/movie/entitys/movie.entity";
 import { User } from "src/user/entitys/user.entity";
@@ -32,3 +33,5 @@ export class Raiting extends Model<Raiting> {
     @BelongsTo(() => Movie)
     movie: Movie
 }
+
+export type RaitingCreationAttributes = CreationAttributes<Raiting>

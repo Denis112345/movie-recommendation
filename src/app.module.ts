@@ -18,6 +18,8 @@ import { Genre } from './movie/entitys/genre.entity';
 import { MovieGenre } from './movie/entitys/movieGener.entity';
 import { ExternalMovieApp } from './externalMovie/externalMovie.module';
 import { CacheModule } from '@nestjs/cache-manager'
+import { RaitingApp } from './raiting/raiting.module';
+import { Raiting } from './raiting/entitys/raiting.entity';
 
 @Module({
   imports: [
@@ -37,9 +39,12 @@ import { CacheModule } from '@nestjs/cache-manager'
           username: dbConfig.username,
           password: dbConfig.password,
           database: dbConfig.db_name,
-          models: [User, Role, Movie, Genre, MovieGenre],
+          models: [User, Role, Movie, Genre, MovieGenre, Raiting],
           autoLoadModels: true,
-          synchronize: true
+          synchronize: true,
+          sync: {
+            alter: true,
+          },
         }
       }
     }),
@@ -57,7 +62,8 @@ import { CacheModule } from '@nestjs/cache-manager'
     UserApp,
     AuthApp,
     MovieApp,
-    ExternalMovieApp
+    ExternalMovieApp,
+    RaitingApp
   ],
   providers: [
     AppService,
