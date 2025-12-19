@@ -1,8 +1,9 @@
-import { BelongsToMany, Model } from "sequelize-typescript";
+import { BelongsToMany, HasMany, Model } from "sequelize-typescript";
 import { Column, DataType, ForeignKey, PrimaryKey, Table } from "sequelize-typescript";
 import { Genre } from "./genre.entity";
 import { MovieGenre } from "./movieGener.entity";
 import { CreationAttributes } from "sequelize";
+import { Raiting } from "src/raiting/entitys/raiting.entity";
 
 
 @Table
@@ -48,6 +49,9 @@ export class Movie extends Model<Movie> {
 
     @Column({type: DataType.FLOAT, defaultValue: 0.0})
     raiting: number 
+
+    @HasMany(() => Raiting)
+    raitings: Raiting[]
 }
 
 export type MovieCreationAttribute = CreationAttributes<Movie> 
