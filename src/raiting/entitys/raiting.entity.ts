@@ -1,4 +1,4 @@
-import { Column, DataType, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
 import { Movie } from "src/movie/entitys/movie.entity";
 import { User } from "src/user/entitys/user.entity";
 
@@ -25,4 +25,10 @@ export class Raiting extends Model<Raiting> {
 
     @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
     declare createdAt: Date
+
+    @BelongsTo(() => User)
+    user: User
+
+    @BelongsTo(() => Movie)
+    movie: Movie
 }

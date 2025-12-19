@@ -7,8 +7,10 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { Role } from './role.entity';
+import { Raiting } from 'src/raiting/entitys/raiting.entity';
 
 @Table
 export class User extends Model<User> {
@@ -44,6 +46,9 @@ export class User extends Model<User> {
 
   @BelongsTo(() => Role)
   role: Role
+
+  @HasMany(() => Raiting)
+  raitings: Raiting[]
 }
 
 export type UserCreationAttributes = CreationAttributes<User>;
