@@ -17,7 +17,7 @@ export class Genre extends Model<Genre> {
             len: [5, 100]
         }
     })
-    title: string
+    declare title: string
 
     @BelongsToMany(() => Movie, () => MovieGenre)
     movies: Movie[]

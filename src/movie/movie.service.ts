@@ -7,6 +7,8 @@ import { MovieDTO } from "./dto/movie.dto";
 import { GenreDTO, GenreSchema } from "./dto/genre.dto";
 import { Genre, GenreCreationAttributes } from "./entitys/genre.entity";
 import { MovieExternalDTO } from "src/externalMovie/dto/movie.externalDto"
+import { RaitingService } from "src/raiting/raiting.service";
+import { Raiting } from "src/raiting/entitys/raiting.entity";
 
 @Injectable()
 export class MovieService {
@@ -15,7 +17,8 @@ export class MovieService {
         private movieRepo: typeof Movie,
         @InjectModel(Genre)
         private genreRepo: typeof Genre,
-        private externalMovie: ExternalMovieService
+        private externalMovie: ExternalMovieService,
+        private raitingService: RaitingService
     ){}
 
     async movieExists(title: string): Promise<Boolean> {
@@ -74,12 +77,33 @@ export class MovieService {
     async getMovie(id: number): Promise<Movie> {
         const movie: Movie | null = await this.movieRepo.findOne({
             where: {id: id},
-            include: {
-                model: Genre,
-                through: { attributes: [] }
-            }
+            include: [
+                {
+                    model: Genre,
+                    through: { attributes: [] }
+                },
+                {
+                    model: Raiting,
+                    required: false
+                }
+            ],
         })
         if (!movie) throw new BadRequestException('Фильма с таким id нет')
         return movie
+    }
+
+    async getAvgMovieRaiting(movie_id: number): Promise<number> {
+        const movie: Movie = await this.getMovie(movie_id)
+
+        const raitings = movie.Raitings || []
+        
+        if (!Array.isArray(raitings) || raitings.length === 0) {
+            return 0
+        }
+
+        const raiting_numbers: number[] = raitings.map((raiting_obj) => raiting_obj.raiting)
+        const avarage: number = raiting_numbers.reduce((sum, num) => sum + num, 0) / raiting_numbers.length
+
+        return avarage
     }
 }

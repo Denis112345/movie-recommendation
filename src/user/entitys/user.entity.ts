@@ -42,7 +42,7 @@ export class User extends Model<User> {
 
   @ForeignKey(() => Role)
   @Column({ type: DataType.INTEGER })
-  role_id: number
+  declare role_id: number
 
   @BelongsTo(() => Role)
   role: Role

@@ -7,7 +7,7 @@ import { RaitingService } from "./raiting.service";
 @Module({
     providers: [RaitingService],
     controllers: [RaitingController],
-    exports: [],
+    exports: [RaitingService],
     imports: [SequelizeModule.forFeature([Raiting])],
 })
 export class RaitingApp {}

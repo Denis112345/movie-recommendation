@@ -5,11 +5,13 @@ import { MovieController } from "./movie.controller";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { Movie } from "./entitys/movie.entity";
 import { Genre } from "./entitys/genre.entity";
+import { RaitingApp } from "src/raiting/raiting.module";
 
 
 @Module({
     imports: [
         ExternalMovieApp,
+        RaitingApp,
         SequelizeModule.forFeature([Movie, Genre]),
     ],
     providers: [MovieService],

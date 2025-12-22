@@ -18,13 +18,13 @@ export class Movie extends Model<Movie> {
             len: [2, 300]
         }
     })
-    title: string
+    declare title: string
 
     @Column({
         type: DataType.TEXT,
         allowNull: true,
     })
-    description?: string
+    declare description?: string
 
     @Column({
         type: DataType.INTEGER,
@@ -36,7 +36,7 @@ export class Movie extends Model<Movie> {
             }
         }
     })
-    releaseYear: number
+    declare releaseYear: number
 
     @BelongsToMany(() => Genre, () => MovieGenre)
     genres: Genre[]
@@ -47,11 +47,8 @@ export class Movie extends Model<Movie> {
     @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
     declare createdAt: Date;
 
-    @Column({type: DataType.FLOAT, defaultValue: 0.0})
-    raiting: number 
-
     @HasMany(() => Raiting)
-    raitings: Raiting[]
+    declare Raitings: Raiting[]
 }
 
 export type MovieCreationAttribute = CreationAttributes<Movie> 

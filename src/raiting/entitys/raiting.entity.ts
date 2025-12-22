@@ -12,17 +12,17 @@ export class Raiting extends Model<Raiting> {
 
     @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER })
-    user_id: number
+    declare user_id: number
 
     @ForeignKey(() => Movie)
     @Column({ type: DataType.INTEGER })
-    movie_id: number
+    declare movie_id: number
 
     @Column({ type: DataType.INTEGER, validate: {
         min: 1,
         max: 5,
     } })
-    raiting: number
+    declare raiting: number
 
     @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
     declare createdAt: Date
