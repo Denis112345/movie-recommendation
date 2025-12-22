@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Movie, MovieCreationAttribute } from "./entitys/movie.entity";
 import { MovieRequestCreateDTO } from "./dto/movie.createDto";
@@ -7,8 +7,8 @@ import { MovieDTO } from "./dto/movie.dto";
 import { GenreDTO, GenreSchema } from "./dto/genre.dto";
 import { Genre, GenreCreationAttributes } from "./entitys/genre.entity";
 import { MovieExternalDTO } from "src/externalMovie/dto/movie.externalDto"
-import { RaitingService } from "src/raiting/raiting.service";
 import { Raiting } from "src/raiting/entitys/raiting.entity";
+
 
 @Injectable()
 export class MovieService {
@@ -18,7 +18,6 @@ export class MovieService {
         @InjectModel(Genre)
         private genreRepo: typeof Genre,
         private externalMovie: ExternalMovieService,
-        private raitingService: RaitingService
     ){}
 
     async movieExists(title: string): Promise<Boolean> {
