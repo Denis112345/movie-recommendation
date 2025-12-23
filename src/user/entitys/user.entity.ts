@@ -48,7 +48,7 @@ export class User extends Model<User> {
   role: Role
 
   @HasMany(() => Raiting)
-  raitings: Raiting[]
+  declare raitings: Raiting[]
 }
 
 export type UserCreationAttributes = CreationAttributes<User>;

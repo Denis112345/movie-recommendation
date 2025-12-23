@@ -28,10 +28,10 @@ export class Raiting extends Model<Raiting> {
     declare createdAt: Date
 
     @BelongsTo(() => User)
-    user: User
+    declare user: User
 
     @BelongsTo(() => Movie)
-    movie: Movie
+    declare movie: Movie
 }
 
 export type RaitingCreationAttributes = CreationAttributes<Raiting>

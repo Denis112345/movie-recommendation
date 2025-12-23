@@ -13,7 +13,6 @@ export class RaitingController {
     @Post()
     @UsePipes(new ZodValidationPipe(RaitingSchema))
     async addRaitingToMovie(@Body() dto: RaitingDTO) {
-        console.log(dto)
         return this.raitingService.createRaiting(dto)
     } 
 }
