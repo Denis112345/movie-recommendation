@@ -31,8 +31,23 @@ export class UserService {
         return await this.userRepo.findOne({ where: { username: username } })
     }
 
-    async findById(id: number): Promise<User | null> {
-        return await this.userRepo.findOne({ where: { id: id } })
+    async findById(id: number): Promise<User> {
+        const user: User | null = await this.userRepo.findOne({where: { id: id }})
+
+        if (!user) throw new BadRequestException(`Пользователя с id ${id} нет.`)
+
+        return user
+    }
+
+    async findByIdWithRaitings(id: number): Promise<User> {
+        const user: User | null = await this.userRepo.findOne({where: { id: id }, include: {
+            model: Raiting,
+            include: [Movie]
+        }})
+
+        if (!user) throw new BadRequestException(`Пользователя с id ${id} нет.`)
+
+        return user
     }
 
     getSimmilarityUserRaitings(first_user_raitings: Raiting[], second_user_raitings: Raiting[]) {
@@ -60,8 +75,6 @@ export class UserService {
 
         for (let movie of allMovies) {
             resonans_interests += (one_user_raiting_movies[movie] || 0) * (second_user_raiting_movies[movie] || 0)
-
-
             vectorPowerOneUser += (one_user_raiting_movies[movie] || 0) ** 2
             vectorPowerSecondUser += (second_user_raiting_movies[movie] || 0) ** 2
         }
@@ -69,75 +82,81 @@ export class UserService {
         return resonans_interests / (Math.sqrt(vectorPowerOneUser) * Math.sqrt(vectorPowerSecondUser))
     }
 
+    getCurrentUsersSimmilarity(current_user: User, all_users: User[]): Record<number, number> {
+        const similaritie_users = all_users.reduce((acc, user) => {
+                const similarity = this.getSimmilarityUserRaitings(current_user.raitings, user.raitings);
+                
+                if (similarity > 0.5) {
+                    acc[user.id] = similarity;
+                }
+                
+                return acc;
+            }, {} as Record<number, number>);
+
+        if (Object.keys(similaritie_users).length == 0 ) throw new BadRequestException('Рекомендаций нет')  
+        return similaritie_users
+    }
+
     getUserRatedMovies(user: User): Movie[] {
         const raitings = user.raitings
         return raitings.map((raiting) => raiting.movie)
     }
 
-    async getUserRecommendations(user_id: number) {
-        const cache_key = `user_rec:${user_id}`
-        const cached: number | undefined = await this.cacheManager.get(cache_key)
-        if (cached) return cached
-
-        const current_user: User | null = await this.userRepo.findOne({where: { id: user_id }, include: {
-            model: Raiting,
-            include: [Movie]
-        }})
-        if (!current_user) throw new BadRequestException('Пользователя для рекомендаций нет')
-
-        const all_users: User[] | undefined = await this.userRepo.findAll({where: {
-            id: {
-                [Op.ne]: user_id
-            }
-        }, include: {
-            model: Raiting,
-            include: [Movie]
-        }})
-        if (!all_users) throw new BadRequestException('Пользователей нет для поиска рекомендаций')
-
-        
-        let user_similarities = all_users.map((user) => {
-            const current_user_raitings = current_user.raitings
-            const user_raitings = user.raitings
-            return {[user.id]: this.getSimmilarityUserRaitings(current_user_raitings, user_raitings)}
-        })
-
-        user_similarities = user_similarities.sort((a, b) => {
-            const valA = Object.values(a)[0] as number;
-            const valB = Object.values(b)[0] as number;
-            return valB - valA
-        }).filter((a) => { return Object.values(a)[0] > 0.5 })
-
-        if (user_similarities.length == 0 ) throw new BadRequestException('Рекомендаций нет')
-
-        const current_user_movie_strings = current_user.raitings.map((raiting) => raiting.movie.title)
-
-        let rec_movies: Movie[] = []
-
-        const best_user_ids: number[] = user_similarities.map((user_similaritie) => {
-            return +Object.keys(user_similaritie)[0]
-        })
-
-
-        for (let user_id of best_user_ids) {
-            const best_user: User | null = await this.userRepo.findOne({where: { id: user_id }, include: {
+    async getBestUniqUsersMovies(current_user_movie_strings: string[], best_user_ids: number[]): Promise<Movie[]>  {
+        const bestUsers: User[] = await this.userRepo.findAll({
+            where: {
+                id: best_user_ids
+            },
+            include: {
                 model: Raiting,
                 include: [Movie]
-            }})
+            }
+        })
 
-            if (!best_user) throw new BadRequestException('Нет такого пользователя')
-            
-            rec_movies.push(...best_user.raitings.map((raiting) => raiting.movie).filter((movie) => {
-                return !current_user_movie_strings.includes(movie.title)
-            }))
-        }
+        const movies: Movie[] = bestUsers.flatMap(user =>
+            user.raitings
+                .map(r => r.movie)
+                .filter(m => !current_user_movie_strings.includes(m.title))
+        )
 
         const uniqueMovies = [
-            ...new Map(rec_movies.map(movie => [movie.title, movie])).values()
+            ...new Map(movies.map(movie => [movie.title, movie])).values()
         ];
 
-        this.cacheManager.set(cache_key, uniqueMovies, 60000)
-
         return uniqueMovies
+    }
+
+    async getUserRecommendations(user_id: number) {
+        const CACHE_TTL = 60000;
+        const CACHE_KEY = `user_rec:${user_id}`
+
+        const cached: Movie[] | undefined = await this.cacheManager.get<Movie[]>(CACHE_KEY)
+        if (cached) return cached
+
+        const currentUser: User = await this.findByIdWithRaitings(user_id)
+        
+        const otherOsers: User[] | undefined = await this.userRepo.findAll({
+            where: {
+                id: {
+                    [Op.ne]: user_id
+                }
+            },
+            include: {
+                model: Raiting,
+                include: [Movie]
+            },
+            limit: 1000
+        })
+        if (!otherOsers) return []
+
+        let similaritie_users = this.getCurrentUsersSimmilarity(currentUser, otherOsers)
+
+        const bestUserIds: number[] = Object.keys(similaritie_users).map(Number)
+        const currentUserMovieStrings = currentUser.raitings.map((raiting) => raiting.movie.title)
+        const recMovies: Movie[] = await this.getBestUniqUsersMovies(currentUserMovieStrings, bestUserIds)
+
+        await this.cacheManager.set(CACHE_KEY, recMovies, CACHE_TTL)
+
+        return recMovies
     }
 }
