@@ -8,6 +8,7 @@ import { GenreDTO, GenreSchema } from "./dto/genre.dto";
 import { Genre, GenreCreationAttributes } from "./entitys/genre.entity";
 import { MovieExternalDTO } from "src/externalMovie/dto/movie.externalDto"
 import { Raiting } from "src/raiting/entitys/raiting.entity";
+import { Sequelize } from "sequelize";
 
 
 @Injectable()
@@ -70,6 +71,24 @@ export class MovieService {
                 model: Genre,
                 through: { attributes: [] }
             }
+        })
+    }
+
+    async getBestMovies(limit: number): Promise<Movie[]> {
+        return await this.movieRepo.findAll({
+            attributes: {
+                include: [
+                    [Sequelize.fn('AVG', Sequelize.col('Raitings.raiting')), 'avg_raiting']
+                ]
+            },
+            include: [{
+                model: Raiting,
+                attributes: []
+            }],
+            group: ['Movie.id'],
+            order: [[Sequelize.literal('avg_raiting'), 'DESC']],
+            limit: limit,
+            subQuery: false
         })
     }
 

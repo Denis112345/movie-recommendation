@@ -135,7 +135,7 @@ export class UserService {
 
         const currentUser: User = await this.findByIdWithRaitings(user_id)
         
-        const otherOsers: User[] | undefined = await this.userRepo.findAll({
+        const otherUsers: User[] | undefined = await this.userRepo.findAll({
             where: {
                 id: {
                     [Op.ne]: user_id
@@ -147,13 +147,17 @@ export class UserService {
             },
             limit: 1000
         })
-        if (!otherOsers) return []
+        if (!otherUsers) return []
 
-        let similaritie_users = this.getCurrentUsersSimmilarity(currentUser, otherOsers)
+        let similaritie_users = this.getCurrentUsersSimmilarity(currentUser, otherUsers)
 
         const bestUserIds: number[] = Object.keys(similaritie_users).map(Number)
         const currentUserMovieStrings = currentUser.raitings.map((raiting) => raiting.movie.title)
-        const recMovies: Movie[] = await this.getBestUniqUsersMovies(currentUserMovieStrings, bestUserIds)
+        let recMovies: Movie[] = await this.getBestUniqUsersMovies(currentUserMovieStrings, bestUserIds)
+
+        if (recMovies.length == 0) {
+            recMovies = await this.movieService.getBestMovies(5)
+        }
 
         await this.cacheManager.set(CACHE_KEY, recMovies, CACHE_TTL)
 
