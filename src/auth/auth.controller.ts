@@ -8,6 +8,7 @@ import { AuthSignInSchema } from "./dto/auth.signInDto";
 import type { AuthSignInDTO } from "./dto/auth.signInDto";
 import { AuthService } from "./auth.service";
 import { Public } from "src/app.decorator";
+import { CreatedAuthUserDTO } from "./dto/auth.createdDto";
 
 
 @Controller('auth')
@@ -20,9 +21,8 @@ export class AuthController {
     @Public()
     @Post('register')
     @UsePipes(new ZodValidationPipe(AuthCreateSchema))
-    async createUser(@Body() dto: AuthCreateDTO): Promise<{id: number, username: string}> {
-        const user: User = await this.userService.create(dto)
-        return { id: user.id, username: user.username }
+    async createUser(@Body() dto: AuthCreateDTO): Promise<CreatedAuthUserDTO> {
+        return this.authService.createUser(dto)
     }
 
     @Public()

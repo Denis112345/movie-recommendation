@@ -4,6 +4,8 @@ import { UserService } from "src/user/user.service";
 import { AuthSignInDTO } from "./dto/auth.signInDto";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt';
+import { AuthCreateDTO } from "./dto/auth.createDto";
+import { CreatedAuthUserDTO, CreatedAuthUserSchema } from "./dto/auth.createdDto";
 
 @Injectable()
 export class AuthService {
@@ -12,6 +14,11 @@ export class AuthService {
         private userService: UserService,
         private jwtService: JwtService,
     ) {}
+
+    async createUser(dto: AuthCreateDTO): Promise<CreatedAuthUserDTO> {
+        const user: User = await this.userService.create(dto)
+        return CreatedAuthUserSchema.parse(user.get({ plain: true }))
+    }
 
     async signIn (dto: AuthSignInDTO): Promise<{jwt_token: string}> {
         const user: User | null = await this.userService.findByUsername(dto.username)
