@@ -14,22 +14,21 @@ import { CreatedAuthUserDTO } from "./dto/auth.createdDto";
 @Controller('auth')
 export class AuthController {
     constructor(
-        private readonly userService: UserService,
         private readonly authService: AuthService
-    ){}
+    ){};
 
     @Public()
     @Post('register')
     @UsePipes(new ZodValidationPipe(AuthCreateSchema))
     async createUser(@Body() dto: AuthCreateDTO): Promise<CreatedAuthUserDTO> {
-        return this.authService.createUser(dto)
-    }
+        return this.authService.createUser(dto);
+    };
 
     @Public()
     @HttpCode(HttpStatus.OK)
     @Post('login')
     @UsePipes(new ZodValidationPipe(AuthSignInSchema))
     async signIn(@Body() dto: AuthSignInDTO): Promise<{jwt_token: string}> {
-        return await this.authService.signIn(dto)
-    }
+        return await this.authService.signIn(dto);
+    };
 }

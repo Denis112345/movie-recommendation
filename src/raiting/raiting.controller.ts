@@ -9,10 +9,10 @@ import { RaitingService } from "./raiting.service";
 export class RaitingController {
     constructor(
         private readonly raitingService: RaitingService
-    ){}
+    ){};
     @Post()
     @UsePipes(new ZodValidationPipe(RaitingSchema))
     async addRaitingToMovie(@Body() dto: RaitingDTO) {
-        return this.raitingService.createRaiting(dto)
-    } 
-}
+        return this.raitingService.createRaiting(dto);
+    };
+};

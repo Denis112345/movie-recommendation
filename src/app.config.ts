@@ -9,6 +9,10 @@ export default () => {
             password: process.env.DB_PASSWORD || 'password',
             provider: process.env.DB_PROVIDER || 'postgres'
         },
-        external_movie_api_token: process.env.EXTERNAL_MOVIE_API_TOKEN || ''
+        external_movie_api_token: process.env.EXTERNAL_MOVIE_API_TOKEN || '',
+        jwt: {
+            salt: process.env.JWT_SALT || 'fallback_salt',
+            expire_time: process.env.EXPIRE_TIME_JWT || '1h'
+        }
     }
 }

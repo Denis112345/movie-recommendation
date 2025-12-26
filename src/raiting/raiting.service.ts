@@ -11,17 +11,16 @@ export class RaitingService {
         @InjectModel(Raiting)
         private readonly raitingRepo: typeof Raiting,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-        
-    ){}
+    ){};
 
     async createRaiting(dto: RaitingDTO): Promise<Raiting> {
-        this.cacheManager.del(`user_rec:${dto.user_id}`)
-        return await this.raitingRepo.create(dto as RaitingCreationAttributes)
-    }
+        this.cacheManager.del(`user_rec:${dto.user_id}`);
+        return await this.raitingRepo.create(dto as RaitingCreationAttributes);
+    };
 
     async getRaitingByID(id: number): Promise<Raiting> {
-        const raiting: Raiting | null = await this.raitingRepo.findOne({ where: {id: id} })
-        if (!raiting) throw new BadRequestException('Рейтинга с таким ID нет')
-        return raiting
-    }
-}
+        const raiting: Raiting | null = await this.raitingRepo.findOne({ where: {id: id} });
+        if (!raiting) throw new BadRequestException('Рейтинга с таким ID нет');
+        return raiting;
+    };
+};

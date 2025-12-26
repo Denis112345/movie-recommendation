@@ -9,33 +9,33 @@ import { CreatedAuthUserDTO, CreatedAuthUserSchema } from "./dto/auth.createdDto
 
 @Injectable()
 export class AuthService {
-    private readonly logger = new Logger(AuthService.name)
+    private readonly logger = new Logger(AuthService.name);
     constructor (
         private userService: UserService,
         private jwtService: JwtService,
-    ) {}
+    ) {};
 
     async createUser(dto: AuthCreateDTO): Promise<CreatedAuthUserDTO> {
-        const user: User = await this.userService.create(dto)
-        return CreatedAuthUserSchema.parse(user.get({ plain: true }))
-    }
+        const user: User = await this.userService.create(dto);
+        return CreatedAuthUserSchema.parse(user.get({ plain: true }));
+    };
 
     async signIn (dto: AuthSignInDTO): Promise<{jwt_token: string}> {
-        const user: User | null = await this.userService.findByUsername(dto.username)
+        const user: User | null = await this.userService.findByUsername(dto.username);
 
         const isPasswordValid = user
             ? await bcrypt.compare(dto.password, user.password)
             : false;
 
         if (!isPasswordValid || !user) {
-            this.logger.warn(`Попытка входа в аккаунт ${user ? user.username : 'которого нет'}`)
-            throw new UnauthorizedException('Неверные данные :(')
+            this.logger.warn(`Попытка входа в аккаунт ${user ? user.username : 'которого нет'}`);
+            throw new UnauthorizedException('Неверные данные :(');
         }
 
-        const payload: {sub: number, username: string} = {sub: user.id, username: user.username}
+        const payload: {sub: number, username: string} = {sub: user.id, username: user.username};
 
         return {
             jwt_token: await this.jwtService.signAsync(payload)
-        }
+        };
     }
 }

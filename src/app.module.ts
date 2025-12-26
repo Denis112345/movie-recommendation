@@ -4,7 +4,6 @@ import { UserApp } from './user/user.module';
 import { AuthApp } from './auth/auth.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtSalt } from './constanst';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config'
@@ -48,10 +47,16 @@ import { Raiting } from './raiting/entitys/raiting.entity';
         }
       }
     }),
-    JwtModule.register({
+    JwtModule.registerAsync({
         global: true,
-        secret: jwtSalt,
-        signOptions: { expiresIn: '1h' },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          secret: configService.get<string>('jwt.salt') || 'fallback_secret',
+          signOptions: { 
+            expiresIn: configService.get<string>('jwt.expire_time') as any || '1h'
+          },
+        })
     }),
     CacheModule.register({
       store: 'memory',

@@ -10,4 +10,4 @@ import { RaitingService } from "./raiting.service";
     exports: [RaitingService],
     imports: [SequelizeModule.forFeature([Raiting])],
 })
-export class RaitingApp {}
+export class RaitingApp {};
