@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UsePipes } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "nestjs-zod";
 import { AuthCreateSchema } from "./dto/auth.createDto";
 import type { AuthCreateDTO } from "./dto/auth.createDto";

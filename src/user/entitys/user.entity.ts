@@ -8,9 +8,11 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  BeforeCreate,
 } from 'sequelize-typescript';
 import { Role } from './role.entity';
 import { Raiting } from 'src/raiting/entitys/raiting.entity';
+import * as bcrypt from 'bcrypt';
 
 @Table
 export class User extends Model<User> {
@@ -33,6 +35,12 @@ export class User extends Model<User> {
     allowNull: false,
   })
   declare password: string;
+
+  @BeforeCreate
+  static async hashPassword(instance: User) {
+    const saltRounds: number = 10
+    instance.password = await bcrypt.hash(instance.password, saltRounds)
+  }
 
   @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
   declare updatedAt: Date;
