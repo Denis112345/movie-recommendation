@@ -30,12 +30,12 @@ export class AuthService {
         if (!isPasswordValid || !user) {
             this.logger.warn(`Попытка входа в аккаунт ${user ? user.username : 'которого нет'}`);
             throw new UnauthorizedException('Неверные данные :(');
-        }
+        };
 
         const payload: {sub: number, username: string} = {sub: user.id, username: user.username};
 
         return {
             jwt_token: await this.jwtService.signAsync(payload)
         };
-    }
-}
+    };
+};
