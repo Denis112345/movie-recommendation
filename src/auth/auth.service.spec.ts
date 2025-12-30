@@ -4,7 +4,7 @@ import { CreatedAuthUserSchema } from "./dto/auth.createdDto";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserService } from "src/user/user.service";
 import { JwtService } from "@nestjs/jwt";
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
 import { AuthSignInSchema } from "./dto/auth.signInDto";
 
@@ -12,6 +12,7 @@ describe('AuthService', () => {
     let service: AuthService;
 
     const USER_PASSWORD: string = 'password123123'
+    const USERNAME: string = 'test123'
     const SALT_ROUND: number = 10
 
     const mockUserService = {
@@ -30,10 +31,10 @@ describe('AuthService', () => {
                     password:  await bcrypt.hash(USER_PASSWORD, SALT_ROUND),
                 }
 
-                return { 
+                return username == USERNAME ? { 
                     ...mockUserCreated,
                     get: jest.fn().mockReturnValue(mockUserCreated)
-                }
+                } : null
             }
         )
     };
@@ -65,7 +66,7 @@ describe('AuthService', () => {
         it('should create user and return it', async () => {
             // Arrange - подготовка моковых данных
             const dto: AuthCreateDTO = AuthCreateSchema.parse(
-                { username: 'test', email: 'test@gmail.com', password: 'TestPass121212' }
+                { username: USERNAME, email: 'test@gmail.com', password: 'TestPass121212' }
             );
 
             // Act - действие
@@ -91,13 +92,34 @@ describe('AuthService', () => {
 
     describe('.signIn()', () => {
         it('should sign in user and return jwt token', async () => {
-            const mockSignInData = AuthSignInSchema.parse({
-                username: 'test123',
+            const mockData = AuthSignInSchema.parse({
+                username: USERNAME,
                 password: USER_PASSWORD
             });
 
-            const result = await service.signIn(mockSignInData);
+            const result = await service.signIn(mockData);
             expect(result).toEqual({jwt_token: 'jwt-token'});
+        });
+
+        it('should throw an BadRequest when dto is null', async () => {
+            const mockData: any = null
+            expect(service.signIn(mockData)).rejects.toThrow(BadRequestException)
+        });
+
+        it('should throw an BadRequest when username is not valid', async () => {
+            const mockData = AuthSignInSchema.parse({
+                username: 'test1234',
+                password: USER_PASSWORD
+            });
+            expect(service.signIn(mockData)).rejects.toThrow(UnauthorizedException)
+        });
+
+        it('should throw an BadRequest when password is not valid', async () => {
+            const mockData = AuthSignInSchema.parse({
+                username: USERNAME,
+                password: 'bad password'
+            });
+            expect(service.signIn(mockData)).rejects.toThrow(UnauthorizedException)
         });
     });
 });
