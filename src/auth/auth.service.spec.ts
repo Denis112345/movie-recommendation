@@ -4,13 +4,10 @@ import { CreatedAuthUserDTO, CreatedAuthUserSchema } from "./dto/auth.createdDto
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserService } from "src/user/user.service";
 import { JwtService } from "@nestjs/jwt";
+import { BadRequestException } from "@nestjs/common";
 
 describe('AuthService', () => {
     let service: AuthService;
-
-    const mockSequelizeUser = (dto: CreatedAuthUserDTO) => ({
-        get: jest.fn().mockReturnValue(dto)
-    })
 
     const mockUserService = {
         create: jest.fn().mockImplementation((dto: AuthCreateDTO) => {
@@ -19,7 +16,7 @@ describe('AuthService', () => {
                 username: dto.username,
                 email: dto.email
             }
-            return mockSequelizeUser(mockUserCreated)
+            return { get: jest.fn().mockReturnValue(mockUserCreated) }
         })
     };
 
@@ -58,5 +55,14 @@ describe('AuthService', () => {
 
         expect(mockUserService.create).toHaveBeenCalledTimes(1)
     });
+
+    it('should throw an error when dto is null', async () => {
+        expect(service.createUser(null as any)).rejects.toThrow(BadRequestException)
+    })
+
+    it('should throw an error if there is not enough data in the dto', async () => {
+        const dto =  { email: 'test@gmail.com', password: 'TestPass121212' }
+        expect(service.createUser(dto as any)).rejects.toThrow(BadRequestException)
+    })
 
 });
