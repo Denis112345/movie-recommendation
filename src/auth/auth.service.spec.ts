@@ -39,30 +39,33 @@ describe('AuthService', () => {
         service = module.get<AuthService>(AuthService)
     });
 
-    it('should create user and return it', async () => {
-        // Arrange - подготовка моковых данных
-        const dto: AuthCreateDTO = AuthCreateSchema.parse(
-            { username: 'test', email: 'test@gmail.com', password: 'TestPass121212' }
-        );
+    describe('.createUser()', () => {
+        it('should create user and return it', async () => {
+            // Arrange - подготовка моковых данных
+            const dto: AuthCreateDTO = AuthCreateSchema.parse(
+                { username: 'test', email: 'test@gmail.com', password: 'TestPass121212' }
+            );
 
-        // Act - действие
-        const result = await service.createUser(dto);
+            // Act - действие
+            const result = await service.createUser(dto);
 
-        // Assert - Проверка результата
-        expect(result).toEqual(CreatedAuthUserSchema.parse(
-            { id: 1, username: dto.username, email: dto.email }
-        ));
+            // Assert - Проверка результата
+            expect(result).toEqual(CreatedAuthUserSchema.parse(
+                { id: 1, username: dto.username, email: dto.email }
+            ));
 
-        expect(mockUserService.create).toHaveBeenCalledTimes(1)
-    });
+            expect(mockUserService.create).toHaveBeenCalledTimes(1)
+        });
 
-    it('should throw an error when dto is null', async () => {
-        expect(service.createUser(null as any)).rejects.toThrow(BadRequestException)
+        it('should throw an error when dto is null', async () => {
+            expect(service.createUser(null as any)).rejects.toThrow(BadRequestException)
+        })
+
+        it('should throw an error if there is not enough data in the dto', async () => {
+            const dto =  { email: 'test@gmail.com', password: 'TestPass121212' }
+            expect(service.createUser(dto as any)).rejects.toThrow(BadRequestException)
+        })
     })
 
-    it('should throw an error if there is not enough data in the dto', async () => {
-        const dto =  { email: 'test@gmail.com', password: 'TestPass121212' }
-        expect(service.createUser(dto as any)).rejects.toThrow(BadRequestException)
-    })
-
+    
 });
