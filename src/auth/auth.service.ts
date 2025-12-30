@@ -16,14 +16,17 @@ export class AuthService {
     ) {};
 
     async createUser(dto: AuthCreateDTO): Promise<CreatedAuthUserDTO> {
-        if (!dto) throw new BadRequestException('Данные для создания пользователя не переданы')
+        if (!dto) throw new BadRequestException('Данные для создания пользователя не переданы');
         const user: User = await this.userService.create(dto);
-        return CreatedAuthUserSchema.parse(user.get({ plain: true }));
+
+        try {
+            return CreatedAuthUserSchema.parse(user.get({ plain: true }));
+        } catch(e) {
+            throw new BadRequestException;
+        };
     };
-
-    async signIn (dto: AuthSignInDTO): Promise<{jwt_token: string}> {
+    async signIn(dto: AuthSignInDTO): Promise<{jwt_token: string}> {
         const user: User | null = await this.userService.findByUsername(dto.username);
-
         const isPasswordValid = user
             ? await bcrypt.compare(dto.password, user.password)
             : false;
