@@ -12,7 +12,7 @@ describe('AuthGuard', () => {
     const createBaseContext = (token?:string) => {
         const mockRequest = {
             headers: {
-                authorization: token ? `Bearer ${token}` : ''
+                authorization: token ? token : ''
             },
             'user': undefined,
         }
@@ -61,21 +61,21 @@ describe('AuthGuard', () => {
     });
 
     describe('canActive', () => {
-        it('should return true if route is public', () => {
+        it('should return true if route is public', async () => {
             jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(true);
-            expect(guard.canActivate(createBaseContext())).resolves.toBe(true);
+            expect(await guard.canActivate(createBaseContext())).toBe(true);
         });
 
-        it('should return throw error if route is\'t public', () => {
+        it('should return throw error if route is\'t public', async () => {
             jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
-            expect(guard.canActivate(createBaseContext())).rejects.toThrow(UnauthorizedException);
+            await expect(guard.canActivate(createBaseContext())).rejects.toThrow(UnauthorizedException);
         });
 
         it('should return true if token is valid', async () => {
             jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({});
             jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
 
-            const context = createBaseContext('token')
+            const context = createBaseContext('Bearer token')
 
             expect(await guard.canActivate(context)).toBe(true);
 
@@ -83,11 +83,17 @@ describe('AuthGuard', () => {
             expect(req.user).toEqual({});
         });
 
-        it('should return true if token is\'t valid', () => {
+        it('should return true if token is\'t valid', async () => {
             jest.spyOn(jwtService, 'verifyAsync').mockRejectedValue(new Error('Не верный токен'));
             jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
-            let context = createBaseContext('token');
-            expect(guard.canActivate(context)).rejects.toThrow(UnauthorizedException);
+            let context = createBaseContext('Bearer token');
+            await expect(guard.canActivate(context)).rejects.toThrow(UnauthorizedException);
+        });
+
+        it('should reuturn throw error if token have not valid format', async () => {
+            jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue({});
+            const context = createBaseContext('not valid token');
+            await expect(guard.canActivate(context)).rejects.toThrow(UnauthorizedException)
         });
     });
 });
