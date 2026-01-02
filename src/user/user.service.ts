@@ -6,7 +6,6 @@ import { CreateOptions, Op } from "sequelize";
 import { MovieService } from "src/movie/movie.service";
 import { Raiting } from "src/raiting/entitys/raiting.entity";
 import { Movie } from "src/movie/entitys/movie.entity";
-import { includes } from "zod";
 import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
 
 

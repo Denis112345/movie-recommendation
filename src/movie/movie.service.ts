@@ -124,10 +124,4 @@ export class MovieService {
 
         return avarage
     }
-
-    // async getFavoriteMovies(user_id: number): Promise<Movie[]> {
-    //     this.movieRepo.findAll({where: {
-                
-    //     }})
-    // }
 }

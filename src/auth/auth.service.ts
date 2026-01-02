@@ -22,7 +22,8 @@ export class AuthService {
         try {
             return CreatedAuthUserSchema.parse(user.get({ plain: true }));
         } catch(e) {
-            throw new BadRequestException;
+            const errorMessage = e?.message?.[0] ?? '';
+            throw new BadRequestException(errorMessage);
         };
     };
 
