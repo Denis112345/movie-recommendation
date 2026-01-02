@@ -63,7 +63,10 @@ describe('AuthGuard', () => {
     describe('canActive', () => {
         it('should return true if route is public', async () => {
             jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(true);
+            const jwtSpy = jest.spyOn(jwtService, 'verifyAsync');
+
             expect(await guard.canActivate(createBaseContext())).toBe(true);
+            expect(jwtSpy).not.toHaveBeenCalled();
         });
 
         it('should return throw error if route is\'t public', async () => {
