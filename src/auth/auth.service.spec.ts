@@ -14,6 +14,7 @@ describe('AuthService', () => {
     const USER_PASSWORD: string = 'password123123'
     const USERNAME: string = 'test123'
     const SALT_ROUND: number = 10
+    const DB_ERROR = new Error('db connection error')
 
     const mockUserService = {
         create: jest.fn().mockImplementation((dto: AuthCreateDTO) => {
@@ -60,6 +61,7 @@ describe('AuthService', () => {
         }).compile();
 
         service = module.get<AuthService>(AuthService)
+        jest.clearAllMocks()
     });
 
     describe('.createUser()', () => {
@@ -87,6 +89,16 @@ describe('AuthService', () => {
         it('should throw an error if there is not enough data in the dto', async () => {
             const dto =  { email: 'test@gmail.com', password: 'TestPass121212' };
             expect(service.createUser(dto as any)).rejects.toThrow(BadRequestException);
+        });
+
+        it('should throw an error if connection for DB close', async () => {
+            jest.spyOn(mockUserService, 'create').mockRejectedValue(DB_ERROR);
+            const dto: AuthCreateDTO = AuthCreateSchema.parse(
+                { username: USERNAME, email: 'test@gmail.com', password: 'TestPass121212' }
+            );
+
+            await expect(service.createUser(dto)).rejects.toThrow(BadRequestException);
+            expect(mockUserService.create).toHaveBeenCalledTimes(1);
         });
     });
 

@@ -17,9 +17,8 @@ export class AuthService {
 
     async createUser(dto: AuthCreateDTO): Promise<CreatedAuthUserDTO> {
         if (!dto) throw new BadRequestException('Данные не переданы');
-        const user: User = await this.userService.create(dto);
-
         try {
+            const user: User = await this.userService.create(dto);
             return CreatedAuthUserSchema.parse(user.get({ plain: true }));
         } catch(e) {
             const errorMessage = e?.message?.[0] ?? '';
