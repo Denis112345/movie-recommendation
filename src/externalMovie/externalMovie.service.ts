@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Inject } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config'
 import { AxiosResponse } from "axios";
 import { MovieRequestCreateDTO } from "src/movie/dto/movie.createDto";
-import { MovieExternalDTO, MovieExternalSchema } from "./dto/movie.externalDto";
+import { MovieExternalDTO } from "./dto/movie.externalDto";
 import { ExternalMovieListDTO, ExternalMovieListSchema } from "./dto/movie.externalListDto";
 import axios from "axios"
 import type { AxiosInstance } from "axios";
@@ -30,10 +30,7 @@ export class ExternalMovieService {
         const cache_key = `movies-by-title:${title}`
         const cached = await this.cacheManager.get(cache_key)
 
-        if (cached) {
-            console.log('return from cache')
-            return cached as ExternalMovieListDTO
-        }
+        if (cached) return cached as ExternalMovieListDTO
 
         const response: AxiosResponse<ExternalMovieListDTO> = await this.client.get('films', {
             params: {
@@ -51,10 +48,7 @@ export class ExternalMovieService {
         const cache_key = `movie:${id}`
         const cached = await this.cacheManager.get(cache_key)
 
-        if (cached) {
-            console.log('return from cache')
-            return cached as MovieExternalDTO
-        }
+        if (cached) return cached as MovieExternalDTO
 
         let response: AxiosResponse<MovieExternalDTO> = await this.client.get(`films/${id}`)
 
